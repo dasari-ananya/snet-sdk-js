@@ -136,6 +136,11 @@ class WebServiceClient extends BaseServiceClient {
  _getModelDetailsRequestMethodDescriptor() {
     return training_pb.ModelDetails;
   }
+
+  _getUpdateModelAccessRequestMethodDescriptor() {
+    return Model.update_model_access.requestType;
+  }
+
 }
 
 export default WebServiceClient;

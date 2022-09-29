@@ -195,6 +195,68 @@ class BaseServiceClient {
     return modelStateRequest;
   }
 
+  async updateModel(grpcMethod, address) {
+    const request = await this._trainingUpdateModel(address, grpcMethod);
+    return new Promise((resolve, reject) => {
+      this._modelServiceClient.update_model_access(request, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+  }
+
+  async _trainingUpdateModel(address, method) {
+    const message = '__update_model';
+    const { currentBlockNumber, signatureBytes } =
+      await this._requestSignForModel(address, message);
+    const ModelStateRequest = this._getUpdateModelAccessRequestMethodDescriptor();
+    const modelStateRequest = new ModelStateRequest();
+   
+    const AuthorizationRequest =
+      this._getAuthorizationRequestMethodDescriptor();
+    const authorizationRequest = new AuthorizationRequest();
+    const ModelDetailsRequest = this._getModelDetailsRequestMethodDescriptor();
+    const modelDetailsRequest = new ModelDetailsRequest();
+    authorizationRequest.setCurrentBlock(currentBlockNumber);
+    logger.debug("setCurrentBlock")
+
+    authorizationRequest.setMessage(message);
+    authorizationRequest.setSignature(signatureBytes);
+    authorizationRequest.setSignerAddress(address);
+
+    modelDetailsRequest.setModelId("");
+    logger.debug("setModelId")
+
+    modelDetailsRequest.setGrpcMethodName(
+      "/example_service.Calculator/train_add"
+    );
+    modelDetailsRequest.setGrpcServiceName("");
+    modelDetailsRequest.setDescription("");
+    modelDetailsRequest.setIsPubliclyAccessible("");
+    modelDetailsRequest.addAddressList([
+      "0x4e1388Acfd6237aeED2b01Da0d4ccFe242e8F6cA",
+      "0xb192B369ABD93e018e0433a1030AdF08AC6aDfC8",
+    ]);
+    modelDetailsRequest.setTrainingDataLink("www.google.com");
+    modelDetailsRequest.setIsDefaultModel("");
+    modelDetailsRequest.setOrganizationId("snet");
+    modelDetailsRequest.setServiceId("example-service");
+    modelDetailsRequest.setGroupId(
+      "qMdFbyUlpWfOuTn0WpJCpKtQATrU6gxz6Wn9zAB1mxo="
+    );
+
+    modelStateRequest.setAuthorization(authorizationRequest);
+    logger.debug("setAuthorization")
+
+    modelStateRequest.setModelDetails(modelDetailsRequest);
+    logger.debug("setModelDetails")
+   
+    return modelStateRequest;
+  }
+
   /**
    * Fetches the latest channel state from the ai service daemon
    * @param channelId
@@ -554,6 +616,12 @@ class BaseServiceClient {
 
   get concurrencyManager() {
     logger.error("concurrencyManager must be implemented in the sub classes");
+  }
+
+  _getUpdateModelAccessRequestMethodDescriptor() {
+    logger.error(
+      "_getUpdateModelAccessRequestMethodDescriptor must be implemented in the sub classes"
+    );
   }
 }
 
