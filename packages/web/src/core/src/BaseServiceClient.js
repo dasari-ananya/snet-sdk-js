@@ -165,7 +165,6 @@ class BaseServiceClient {
       await this._requestSignForModel(address, message);
     const ModelStateRequest = this._getCreateModelRequestMethodDescriptor();
     const modelStateRequest = new ModelStateRequest();
-
     const AuthorizationRequest =
       this._getAuthorizationRequestMethodDescriptor();
     const authorizationRequest = new AuthorizationRequest();
